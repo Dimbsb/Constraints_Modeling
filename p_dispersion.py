@@ -91,6 +91,8 @@ if solver.solve():
     print(f"MAXIMIZED DISTANCE: {MinimumDistance.value()}")
 else:
     print("NO SOLUTION FOUND")
+    
+    
 
  
  

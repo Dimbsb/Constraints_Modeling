@@ -125,3 +125,5 @@ if solver.solve():
     print(f"MAXIMIZED DISTANCE: {b.value()}")
 else:
     print("NO SOLUTION FOUND")
+    
+    
