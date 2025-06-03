@@ -2,8 +2,10 @@ import numpy as np
 from cpmpy import *
 from cpmpy.solvers.ortools import CPM_ortools
 from cpmpy.expressions.globalconstraints import Element
+import random
 
-print("\n\n\n---------------------------------------------P-DISPERSION---------------------------------------------\n")
+
+print("\n\n\n---------------------------------------------P-DISPERSION-WITH-DISTANCE-CONSTRAINTS---------------------------------------------\n")
 
 # ----------------------------
 # 1. Define 5x5 grid 
@@ -31,7 +33,7 @@ for idx, coord in enumerate(P):
 # p: the number of facilities to be located
 # ----------------------------
 
-p = 3
+p = 5
 F = [intvar(0, n_points-1, name=f"F{i}") for i in range(p)]
 
 # Print the facility variables 
@@ -58,23 +60,48 @@ for i in range(n_points):
 # Optimization function to maximize the minimum distance between any two facilities
 # ----------------------------
 
-# Initialize the model
-model = Model()
+# Maximum Distance Bounds
+MaximumDistance = D.max()
 
-# MinimumDistance declaration from 0 to max
-MinimumDistance= intvar(0, D.max(), name="MinimumDistance")
+# Random distance constraints generation
+LowerValue = np.zeros((p, p), dtype=int)
+UpperValue = np.zeros((p, p), dtype=int)
 
 for i in range(p):
-    for j in range(i+1, p):
-        # dij declaration from 0 to max
+    for j in range(p):
+        if i == j:
+            LowerValue[i, j] = 0
+            UpperValue[i, j] = MaximumDistance
+        elif i < j:
+            d2 = random.randint(1, MaximumDistance // 3)
+            d1 = random.randint(d2 + 2, MaximumDistance)
+            LowerValue[i, j] = d2
+            UpperValue[i, j] = d1
+            LowerValue[j, i] = d2
+            UpperValue[j, i] = d1
+
+# Print generated constraints 
+print("LOWER DISTANCE BOUNDS (LowerValue):")
+print(LowerValue)
+print("\nUPPER DISTANCE DOUNDS (UpperValue):")
+print(UpperValue)
+
+# Initialize the model
+model = Model() 
+
+# MinimumDistance declaration from 0 to max
+MinimumDistance = intvar(0, MaximumDistance, name="MinimumDistance")
+
+for i in range(p):
+    for j in range(i + 1, p):
         dij = intvar(0, D.max(), name=f"dij_{i}_{j}")
-        # Get distance between pairs from array D (Element)
-        model += [dij == Element(D_flat, F[i]*n_points + F[j])]
-        # Constraint to ensure that the minimum distance is less or equal to the distance between pairs
+        model += [dij == Element(D_flat, F[i] * n_points + F[j])]
+        model += [dij > LowerValue[i][j]]
+        model += [dij < UpperValue[i][j]]
         model += [MinimumDistance <= dij]
 
 # Constraint (all facilities will be at different points)
-model += AllDifferent(list(F))
+model += AllDifferent(F)
 
 # Use the model to maximize the minimum distance
 model.maximize(MinimumDistance)
@@ -91,6 +118,3 @@ if solver.solve():
     print(f"MAXIMIZED DISTANCE: {MinimumDistance.value()}")
 else:
     print("NO SOLUTION FOUND")
-
- 
- 
