@@ -3,6 +3,8 @@ from cpmpy import *
 from cpmpy.solvers.ortools import CPM_ortools
 from cpmpy.expressions.globalconstraints import Element
 
+print("\n\n\n---------------------------------------------P-DISPERSION---------------------------------------------\n")
+
 # ----------------------------
 # 1. Define 5x5 grid 
 # ----------------------------
@@ -29,7 +31,7 @@ for idx, coord in enumerate(P):
 # p: the number of facilities to be located
 # ----------------------------
 
-p = 6
+p = 3
 F = [intvar(0, n_points-1, name=f"F{i}") for i in range(p)]
 
 # Print the facility variables 
@@ -65,7 +67,7 @@ MinimumDistance= intvar(0, D.max(), name="MinimumDistance")
 for i in range(p):
     for j in range(i+1, p):
         # DistanceBetweenPairs declaration from 0 to max
-        DistanceBetweenPairs = intvar(0, D.max(), name=f"dist_{i}_{j}")
+        DistanceBetweenPairs = intvar(0, D.max(), name=f"DistanceBetweenPairs_{i}_{j}")
         # Get distance between pairs from array D (Element)
         model += [DistanceBetweenPairs == Element(D_flat, F[i]*n_points + F[j])]
         # Constraint to ensure that the minimum distance is less or equal to the distance between pairs
