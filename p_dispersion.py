@@ -1,7 +1,6 @@
 import numpy as np
 from cpmpy import *
 from cpmpy.solvers.ortools import CPM_ortools
-import itertools
 from cpmpy.expressions.globalconstraints import Element
 
 # ----------------------------
@@ -11,14 +10,13 @@ from cpmpy.expressions.globalconstraints import Element
 grid_size = 5
 
 # P: the set of candidate facility locations.
-points = [(i, j) for i in range(grid_size) for j in range(grid_size)]
-P = points
-n_points = len(points)
+P = [(i, j) for i in range(grid_size) for j in range(grid_size)]
+n_points = len(P)
 
 # Print the grid points 
 print("GRID POINTS:") 
 for i in range(grid_size):
-    print(" ".join(f"{points[i * grid_size + j]}" for j in range(grid_size)))
+    print(" ".join(f"{P[i * grid_size + j]}" for j in range(grid_size)))
 print()  
 
 # Print the candidate facility locations P 
@@ -42,12 +40,10 @@ for i in range(p):
 # ----------------------------
 # 2x2 Distance matrix D
 # ----------------------------
-
-D = [[0 for _ in range(n_points)] for _ in range(n_points)]
+ 
 # Calculate the Manhattan distance between each pair of points
-for i in range(n_points):
-    for j in range(n_points):
-        D[i][j] = abs(points[i][0] - points[j][0]) + abs(points[i][1] - points[j][1])
+coords = np.array(P)
+D = np.abs(coords[:, None, :] - coords[None, :, :]).sum(axis=2)
 
 # Print the Manhattan distance matrix D
 print("\nDISTANCE MATRIX D (Manhattan distances):")
@@ -90,7 +86,7 @@ solver = CPM_ortools(model)
 if solver.solve():
     print("\nOPTIMAL FACILITY LOCATIONS - FINAL SOLUTION:")
     for i in range(p):
-        print(f"FACILITY {i}: {points[F[i].value()]}")
+        print(f"FACILITY {i}: {P[F[i].value()]}")
     print(f"MAXIMIZED DISTANCE: {MinimumDistance.value()}")
 else:
     print("NO SOLUTION FOUND")
