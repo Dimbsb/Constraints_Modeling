@@ -67,11 +67,13 @@ MaximumDistance = D.max()
 LowerValue = np.zeros((p, p), dtype=int)
 UpperValue = np.zeros((p, p), dtype=int)
 
+# d2: Random lower bound [1, MaximumDistance/3]
+# d1: Random upper bound [d2+2, MaximumDistance]
 for i in range(p):
     for j in range(p):
         if i == j:
-            LowerValue[i, j] = 0
-            UpperValue[i, j] = MaximumDistance
+            LowerValue[i, j] = 0 # f1 to f1
+            UpperValue[i, j] = MaximumDistance # No Constraint 
         elif i < j:
             d2 = random.randint(1, MaximumDistance // 3)
             d1 = random.randint(d2 + 2, MaximumDistance)
@@ -90,21 +92,26 @@ print(UpperValue)
 model = Model() 
 
 # MinimumDistance declaration from 0 to max
-MinimumDistance = intvar(0, MaximumDistance, name="MinimumDistance")
+b = intvar(0, MaximumDistance, name="b")
 
 for i in range(p):
     for j in range(i + 1, p):
+        # dij declaration from 0 to max... Value from Manhattan
         dij = intvar(0, D.max(), name=f"dij_{i}_{j}")
+        # Get distance between pairs from array D (Element)
         model += [dij == Element(D_flat, F[i] * n_points + F[j])]
+        # distance constraint > 
         model += [dij > LowerValue[i][j]]
+        # distance constraint <
         model += [dij < UpperValue[i][j]]
-        model += [MinimumDistance <= dij]
+        # Constraint to ensure that the minimum distance is less or equal to the distance between pairs
+        model += [b <= dij]
 
 # Constraint (all facilities will be at different points)
 model += AllDifferent(F)
 
 # Use the model to maximize the minimum distance
-model.maximize(MinimumDistance)
+model.maximize(b)
 
 # ----------------------------
 # Solve the model with CPM_ortools and print the solution
@@ -115,6 +122,6 @@ if solver.solve():
     print("\nOPTIMAL FACILITY LOCATIONS - FINAL SOLUTION:")
     for i in range(p):
         print(f"FACILITY {i}: {P[F[i].value()]}")
-    print(f"MAXIMIZED DISTANCE: {MinimumDistance.value()}")
+    print(f"MAXIMIZED DISTANCE: {b.value()}")
 else:
     print("NO SOLUTION FOUND")

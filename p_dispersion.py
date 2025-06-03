@@ -66,7 +66,7 @@ MinimumDistance= intvar(0, D.max(), name="MinimumDistance")
 
 for i in range(p):
     for j in range(i+1, p):
-        # dij declaration from 0 to max
+        # dij declaration from 0 to max... Value from Manhattan
         dij = intvar(0, D.max(), name=f"dij_{i}_{j}")
         # Get distance between pairs from array D (Element)
         model += [dij == Element(D_flat, F[i]*n_points + F[j])]
