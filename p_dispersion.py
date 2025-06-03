@@ -44,6 +44,8 @@ for i in range(p):
 # Calculate the Manhattan distance between each pair of points
 coords = np.array(P)
 D = np.abs(coords[:, None, :] - coords[None, :, :]).sum(axis=2)
+# Make D flat (Element)
+D_flat = D.flatten().tolist()
 
 # Print the Manhattan distance matrix D
 print("\nDISTANCE MATRIX D (Manhattan distances):")
@@ -57,23 +59,20 @@ for i in range(n_points):
 # Initialize the model
 model = Model()
 
-# Make D flat (Element)
-D_flat = [d for row in D for d in row]
-
 # MinimumDistance declaration from 0 to max
-MinimumDistance= intvar(0, max(max(row) for row in D), name="MinimumDistance")
+MinimumDistance= intvar(0, D.max(), name="MinimumDistance")
 
 for i in range(p):
     for j in range(i+1, p):
         # DistanceBetweenPairs declaration from 0 to max
-        DistanceBetweenPairs = intvar(0, max(max(row) for row in D), name=f"dist_{i}_{j}")
+        DistanceBetweenPairs = intvar(0, D.max(), name=f"dist_{i}_{j}")
         # Get distance between pairs from array D (Element)
         model += [DistanceBetweenPairs == Element(D_flat, F[i]*n_points + F[j])]
         # Constraint to ensure that the minimum distance is less or equal to the distance between pairs
         model += [MinimumDistance <= DistanceBetweenPairs]
 
 # Constraint (all facilities will be at different points)
-model += [F[i] != F[j] for i in range(p) for j in range(i + 1, p)]
+model += AllDifferent(list(F))
 
 # Use the model to maximize the minimum distance
 model.maximize(MinimumDistance)
