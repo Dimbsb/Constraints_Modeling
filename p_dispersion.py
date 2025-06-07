@@ -31,7 +31,7 @@ for idx, coord in enumerate(P):
 # p: the number of facilities to be located
 # ----------------------------
 
-p = 3
+p = 5
 F = [intvar(0, n_points-1, name=f"F{i}") for i in range(p)]
 
 # Print the facility variables 

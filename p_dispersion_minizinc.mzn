@@ -17,17 +17,17 @@ array[Points] of int: Px = [ (i-1) div grid_size | i in Points ];
 array[Points] of int: Py = [ (i-1) mod grid_size | i in Points ];
 
 % ----------------------------
-% 2x2 Distance matrix D
-% Calculate the Manhattan distance between each pair of points
-% ----------------------------
-array[Points, Points] of int: D = array2d(Points, Points, [ abs(Px[i]-Px[j]) + abs(Py[i]-Py[j]) | i in Points, j in Points ]);
-
-% ----------------------------
 % F: the set of facilities to be located
 % p: the number of facilities to be located
 % ----------------------------
 int: p = 5;
 array[1..p] of var Points: F;
+
+% ----------------------------
+% 2x2 Distance matrix D
+% Calculate the Manhattan distance between each pair of points
+% ----------------------------
+array[Points, Points] of int: D = array2d(Points, Points, [ abs(Px[i]-Px[j]) + abs(Py[i]-Py[j]) | i in Points, j in Points ]);
 
 % MinimumDistance declaration from 0 to max 
 var 0..max(D): MinimumDistance;
