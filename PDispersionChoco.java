@@ -1,4 +1,5 @@
 package com.example;
+
 import org.chocosolver.solver.Model;
 import org.chocosolver.solver.Solution;
 import org.chocosolver.solver.variables.IntVar;
@@ -31,7 +32,7 @@ public class PDispersionChoco {
                 D[i][j] = Math.abs(P[i][0] - P[j][0]) + Math.abs(P[i][1] - P[j][1]);
             }
         }
-        
+
         // ----------------------------
         // Model
         // F: the set of facilities to be located
@@ -41,7 +42,7 @@ public class PDispersionChoco {
         Model model = new Model("P-Dispersion");
         IntVar[] F = model.intVarArray("F", p, 0, nPoints - 1, false);
 
-        //Maximum distance variable
+        // Maximum distance variable
         int Dmax = 0;
         for (int i = 0; i < nPoints; i++) {
             for (int j = 0; j < nPoints; j++) {
@@ -65,10 +66,20 @@ public class PDispersionChoco {
         // Constraints
         for (int i = 0; i < p; i++) {
             for (int j = i + 1; j < p; j++) {
+
+                // dij declaration from 0 to max... Value from Manhattan
                 IntVar dij = model.intVar("dij_" + i + "_" + j, 0, Dmax);
+                // Index variable will represent a position (e.g., 0 to 24 for a 5x5 grid)
+                // F[i] is the index of the first facility and F[j] is the index of the second
+                // index = F[i] * nPoints + F[j]...nPoints = 5, F[i] = 2, F[j] = 3...index = 2 * 5 + 3 = 13
+                // D_flat[13] gives the distance between points 2 and 3
                 IntVar index = model.intVar("index_" + i + "_" + j, 0, nPoints * nPoints - 1);
-                model.arithm(index, "=", model.intScaleView(F[i], nPoints), "+", F[j]).post();
+                model.scalar(new IntVar[] { F[i], F[j] }, new int[] { nPoints, 1 }, "=", index).post();
+
+                // Get distance between pairs from array D (Element)
                 model.element(dij, D_flat, index).post();
+                // Constraint to ensure that the minimum distance is less or equal to the
+                // distance between pairs
                 model.arithm(MinimumDistance, "<=", dij).post();
             }
         }
