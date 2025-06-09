@@ -63,7 +63,9 @@ public class PDispersionChoco {
             }
         }
 
-        // Constraints
+        // ----------------------------
+        // 5. Constraints
+        // ----------------------------
         for (int i = 0; i < p; i++) {
             for (int j = i + 1; j < p; j++) {
 
@@ -91,18 +93,29 @@ public class PDispersionChoco {
         model.setObjective(Model.MAXIMIZE, MinimumDistance);
 
         // ----------------------------
-        // Solve the model with Choco Solver and print the solution
+        // 5. Solve and Time
         // ----------------------------
+        long startTime = System.nanoTime();
+
         Solution solution = model.getSolver().findOptimalSolution(MinimumDistance, Model.MAXIMIZE);
+
+        long endTime = System.nanoTime();
+        double TotalTime = (endTime - startTime) / 1_000_000_000.0;
+
+        // ----------------------------
+        // 6. Output
+        // ----------------------------
         if (solution != null) {
             System.out.println("\nOPTIMAL FACILITY LOCATIONS - FINAL SOLUTION:");
             for (int i = 0; i < p; i++) {
                 int idx = solution.getIntVal(F[i]);
                 System.out.printf("FACILITY %d: (%d, %d)\n", i, P[idx][0], P[idx][1]);
             }
-            System.out.println("MAXIMIZED DISTANCE: " + solution.getIntVal(MinimumDistance));
+            System.out.println("MAXIMIZED MINIMUM DISTANCE: " + solution.getIntVal(MinimumDistance));
         } else {
             System.out.println("NO SOLUTION FOUND");
         }
+
+        System.out.printf("EXECUTION TIME: %.3f seconds\n", TotalTime);
     }
 }

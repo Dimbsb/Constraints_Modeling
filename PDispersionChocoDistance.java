@@ -66,6 +66,7 @@ public class PDispersionChocoDistance {
         // ----------------------------
         // Random distance constraints generation
         // ----------------------------
+
         int[][] LowerValue = new int[p][p];
         int[][] UpperValue = new int[p][p];
         java.util.Random rand = new java.util.Random();
@@ -105,6 +106,35 @@ public class PDispersionChocoDistance {
             System.out.println();
         }
 
+        /*
+         * int[][] LowerValue = {
+         * {0, 1, 2, 1, 1, 1, 2, 1, 1, 2},
+         * {1, 0, 2, 2, 2, 2, 1, 2, 2, 2},
+         * {2, 2, 0, 1, 2, 2, 1, 2, 1, 2},
+         * {1, 2, 1, 0, 1, 2, 2, 2, 1, 2},
+         * {1, 2, 2, 1, 0, 1, 2, 2, 2, 2},
+         * {1, 2, 2, 2, 1, 0, 1, 2, 1, 2},
+         * {2, 1, 1, 2, 2, 1, 0, 2, 2, 2},
+         * {1, 2, 2, 2, 2, 2, 2, 0, 1, 1},
+         * {1, 2, 1, 1, 2, 1, 2, 1, 0 ,1},
+         * {2 ,2 ,2 ,2 ,2 ,2 ,2 ,1 ,1 ,0}
+         * };
+         * 
+         * int[][] UpperValue = {
+         * {8, 7, 7, 4, 3, 4, 4, 4, 5, 8},
+         * {7, 8, 4, 7, 5, 5, 7, 8, 7, 6},
+         * {7, 4, 8, 4, 5, 7, 7, 7, 7, 6},
+         * {4, 7, 4, 8, 8, 7, 7, 7, 4, 7},
+         * {3, 5, 5, 8, 8, 7, 4, 8, 8 ,7},
+         * {4 ,5 ,7 ,7 ,7 ,8 ,8 ,7 ,3 ,7},
+         * {4 ,7 ,7 ,7 ,4 ,8 ,8 ,7 ,5 ,6},
+         * {4 ,8 ,7 ,7 ,8 ,7 ,7 ,8 ,5 ,4},
+         * {5 ,7 ,7 ,4 ,8 ,3 ,5 ,5 ,8 ,5},
+         * {8 ,6 ,6 ,7 ,7 ,7 ,6 ,4 ,5 ,8}
+         * };
+         * 
+         */
+
         // ----------------------------
         // 5. Constraints
         // ----------------------------
@@ -134,10 +164,18 @@ public class PDispersionChocoDistance {
         model.setObjective(Model.MAXIMIZE, MinimumDistance);
 
         // ----------------------------
-        // 6. Solve and Print
+        // 6. Solve and Time
         // ----------------------------
+        long startTime = System.nanoTime(); // Start timing
+
         Solution solution = model.getSolver().findOptimalSolution(MinimumDistance, Model.MAXIMIZE);
 
+        long endTime = System.nanoTime(); // End timing
+        double TotalTime = (endTime - startTime) / 1_000_000_000.0;
+
+        // ----------------------------
+        // 7. Output Results
+        // ----------------------------
         if (solution != null) {
             System.out.println("\nOPTIMAL FACILITY LOCATIONS - FINAL SOLUTION:");
             for (int i = 0; i < p; i++) {
@@ -148,5 +186,7 @@ public class PDispersionChocoDistance {
         } else {
             System.out.println("NO SOLUTION FOUND");
         }
+
+        System.out.printf("TIME TAKEN: %.3f seconds\n", TotalTime);
     }
 }

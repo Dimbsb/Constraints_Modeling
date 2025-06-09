@@ -2,6 +2,7 @@ import numpy as np
 from cpmpy import *
 from cpmpy.solvers.ortools import CPM_ortools
 from cpmpy.expressions.globalconstraints import Element
+import time
 
 print("\n\n\n---------------------------------------------P-DISPERSION---------------------------------------------\n")
 
@@ -83,16 +84,30 @@ model.maximize(MinimumDistance)
 # Solve the model with CPM_ortools and print the solution
 # ----------------------------
 print("\nCALL THE SOLVER...")
+
+# Start timing
+start_time = time.time()
+
 solver = CPM_ortools(model)
-if solver.solve():
+solved = solver.solve()
+
+# End timing
+end_time = time.time()
+TotalTime = end_time - start_time
+
+# Show solution
+if solved:
     print("\nOPTIMAL FACILITY LOCATIONS - FINAL SOLUTION:")
     for i in range(p):
         print(f"FACILITY {i}: {P[F[i].value()]}")
     print(f"MAXIMIZED DISTANCE: {MinimumDistance.value()}")
 else:
     print("NO SOLUTION FOUND")
-    
-    
+
+# Print time taken
+print(f"\nTIME TAKEN: {TotalTime:.3f} seconds")
+
+ 
 
  
  
