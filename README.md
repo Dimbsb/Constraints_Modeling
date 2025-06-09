@@ -1,4 +1,6 @@
 # Constraints_Modeling
+# p-center
+# p-dispersion 
 
 A repository for exploring and implementing constraint modeling approaches using Java, Python, and MiniZinc.
 
